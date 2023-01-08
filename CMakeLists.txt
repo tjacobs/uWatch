@@ -44,11 +44,3 @@ hardware_flash
 hardware_sync
 pico_bootsel_via_double_reset
 )
-
-# Copy
-add_custom_command(
-  TARGET main POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy
-    ${CMAKE_CURRENT_BINARY_DIR}/main.uf2
-    ${CMAKE_CURRENT_BINARY_DIR}/../uf2/main.uf2
-)
