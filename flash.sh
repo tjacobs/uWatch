@@ -1,1 +1,1 @@
-picotool/build/picotool load build/*.hex
+picotool/build/picotool load build/*.elf
