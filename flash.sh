@@ -1,2 +1,1 @@
-picotool/build/picotool load -f build/*.elf
-picotool/build/picotool reboot
+picotool/build/picotool load -f build/main.uf2
