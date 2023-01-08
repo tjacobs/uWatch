@@ -48,7 +48,7 @@ if (NOT TARGET _pico_sdk_inclusion_marker)
     set(PICO_SDK_TESTS_ENABLED "${PICO_SDK_TESTS_ENABLED}" CACHE INTERNAL "Enable build of SDK tests")
 
     # add docs at the end, as we gather documentation dirs as we go
-    add_subdirectory(docs)
+    #add_subdirectory(docs)
 
     if (NOT PICO_SDK_TOP_LEVEL_PROJECT)
         pico_promote_common_scope_vars()

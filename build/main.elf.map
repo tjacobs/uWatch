@@ -1245,9 +1245,9 @@ Discarded input sections
                 0x0000000000000000      0x1ac lib/QMI8658/libQMI8658.a(QMI8658.c.obj)
  .text.QMI8658_reset
                 0x0000000000000000       0x48 lib/QMI8658/libQMI8658.a(QMI8658.c.obj)
- .text          0x0000000000000000        0x0 /var/folders/m0/ttff6rr55_j_jmymkq5bkjhr0000gn/T//ccm7S537.o
- .data          0x0000000000000000        0x0 /var/folders/m0/ttff6rr55_j_jmymkq5bkjhr0000gn/T//ccm7S537.o
- .bss           0x0000000000000000        0x0 /var/folders/m0/ttff6rr55_j_jmymkq5bkjhr0000gn/T//ccm7S537.o
+ .text          0x0000000000000000        0x0 /var/folders/m0/ttff6rr55_j_jmymkq5bkjhr0000gn/T//cczjY0bp.o
+ .data          0x0000000000000000        0x0 /var/folders/m0/ttff6rr55_j_jmymkq5bkjhr0000gn/T//cczjY0bp.o
+ .bss           0x0000000000000000        0x0 /var/folders/m0/ttff6rr55_j_jmymkq5bkjhr0000gn/T//cczjY0bp.o
  .data          0x0000000000000000        0x0 /Applications/ArmGNUToolchain/12.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v6-m/nofp/libgcc.a(_dvmd_tls.o)
  .bss           0x0000000000000000        0x0 /Applications/ArmGNUToolchain/12.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v6-m/nofp/libgcc.a(_dvmd_tls.o)
  .text          0x0000000000000000        0x0 /Applications/ArmGNUToolchain/12.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp/libc.a(libc_a-atoi.o)
@@ -1524,7 +1524,7 @@ LOAD /Applications/ArmGNUToolchain/12.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-no
 .boot2          0x0000000010000000      0x100
                 0x0000000010000000                __boot2_start__ = .
  *(.boot2)
- .boot2         0x0000000010000000      0x100 /var/folders/m0/ttff6rr55_j_jmymkq5bkjhr0000gn/T//ccm7S537.o
+ .boot2         0x0000000010000000      0x100 /var/folders/m0/ttff6rr55_j_jmymkq5bkjhr0000gn/T//cczjY0bp.o
                 0x0000000010000100                __boot2_end__ = .
                 0x0000000000000001                ASSERT (((__boot2_end__ - __boot2_start__) == 0x100), ERROR: Pico second stage bootloader must be 256 bytes in size)
 
@@ -3196,7 +3196,7 @@ LOAD CMakeFiles/main.dir/pico-sdk/src/rp2_common/hardware_flash/flash.c.obj
 LOAD CMakeFiles/main.dir/pico-sdk/src/rp2_common/pico_bootsel_via_double_reset/pico_bootsel_via_double_reset.c.obj
 LOAD lib/lcd/liblcd.a
 LOAD lib/QMI8658/libQMI8658.a
-LOAD /var/folders/m0/ttff6rr55_j_jmymkq5bkjhr0000gn/T//ccm7S537.o
+LOAD /var/folders/m0/ttff6rr55_j_jmymkq5bkjhr0000gn/T//cczjY0bp.o
 LOAD /Applications/ArmGNUToolchain/12.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp/libstdc++.a
 LOAD /Applications/ArmGNUToolchain/12.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp/libm.a
 START GROUP
@@ -3310,7 +3310,7 @@ LOAD linker stubs
  .ARM.attributes
                 0x0000000000000776       0x2c lib/QMI8658/libQMI8658.a(QMI8658.c.obj)
  .ARM.attributes
-                0x00000000000007a2       0x22 /var/folders/m0/ttff6rr55_j_jmymkq5bkjhr0000gn/T//ccm7S537.o
+                0x00000000000007a2       0x22 /var/folders/m0/ttff6rr55_j_jmymkq5bkjhr0000gn/T//cczjY0bp.o
  .ARM.attributes
                 0x00000000000007c4       0x1e /Applications/ArmGNUToolchain/12.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v6-m/nofp/libgcc.a(_dvmd_tls.o)
  .ARM.attributes

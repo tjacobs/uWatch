@@ -149,8 +149,6 @@
 /Users/tom/Desktop/uWatch/build/pico-sdk/src/rp2040/hardware_regs/CMakeFiles/rebuild_cache.dir
 /Users/tom/Desktop/uWatch/build/pico-sdk/src/rp2040/hardware_structs/CMakeFiles/edit_cache.dir
 /Users/tom/Desktop/uWatch/build/pico-sdk/src/rp2040/hardware_structs/CMakeFiles/rebuild_cache.dir
-/Users/tom/Desktop/uWatch/build/pico-sdk/docs/CMakeFiles/edit_cache.dir
-/Users/tom/Desktop/uWatch/build/pico-sdk/docs/CMakeFiles/rebuild_cache.dir
 /Users/tom/Desktop/uWatch/build/lib/lcd/CMakeFiles/lcd.dir
 /Users/tom/Desktop/uWatch/build/lib/lcd/CMakeFiles/edit_cache.dir
 /Users/tom/Desktop/uWatch/build/lib/lcd/CMakeFiles/rebuild_cache.dir

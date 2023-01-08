@@ -120,35 +120,17 @@ lib/lcd/clean: lib/lcd/CMakeFiles/lcd.dir/clean
 # Recursive "all" directory target.
 pico-sdk/all: pico-sdk/tools/all
 pico-sdk/all: pico-sdk/src/all
-pico-sdk/all: pico-sdk/docs/all
 .PHONY : pico-sdk/all
 
 # Recursive "preinstall" directory target.
 pico-sdk/preinstall: pico-sdk/tools/preinstall
 pico-sdk/preinstall: pico-sdk/src/preinstall
-pico-sdk/preinstall: pico-sdk/docs/preinstall
 .PHONY : pico-sdk/preinstall
 
 # Recursive "clean" directory target.
 pico-sdk/clean: pico-sdk/tools/clean
 pico-sdk/clean: pico-sdk/src/clean
-pico-sdk/clean: pico-sdk/docs/clean
 .PHONY : pico-sdk/clean
-
-#=============================================================================
-# Directory level rules for directory pico-sdk/docs
-
-# Recursive "all" directory target.
-pico-sdk/docs/all:
-.PHONY : pico-sdk/docs/all
-
-# Recursive "preinstall" directory target.
-pico-sdk/docs/preinstall:
-.PHONY : pico-sdk/docs/preinstall
-
-# Recursive "clean" directory target.
-pico-sdk/docs/clean:
-.PHONY : pico-sdk/docs/clean
 
 #=============================================================================
 # Directory level rules for directory pico-sdk/src

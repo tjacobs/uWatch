@@ -1,7 +1,7 @@
 # uWatch
 ## Install
 
-`./install.sh'
+`./install.sh`
 
 ## Build
 

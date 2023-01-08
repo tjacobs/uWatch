@@ -24,7 +24,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/Users/tom/Desktop/uWatch/pico-sdk/cmake/preload/platforms/rp2040.cmake"
   "/Users/tom/Desktop/uWatch/pico-sdk/cmake/preload/toolchains/find_compiler.cmake"
   "/Users/tom/Desktop/uWatch/pico-sdk/cmake/preload/toolchains/pico_arm_gcc.cmake"
-  "/Users/tom/Desktop/uWatch/pico-sdk/docs/CMakeLists.txt"
   "/Users/tom/Desktop/uWatch/pico-sdk/pico_sdk_init.cmake"
   "/Users/tom/Desktop/uWatch/pico-sdk/pico_sdk_version.cmake"
   "/Users/tom/Desktop/uWatch/pico-sdk/src/CMakeLists.txt"
@@ -124,7 +123,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/opt/homebrew/Cellar/cmake/3.24.2/share/cmake/Modules/ExternalProject/RepositoryInfo.txt.in"
   "/opt/homebrew/Cellar/cmake/3.24.2/share/cmake/Modules/ExternalProject/cfgcmd.txt.in"
   "/opt/homebrew/Cellar/cmake/3.24.2/share/cmake/Modules/ExternalProject/mkdirs.cmake.in"
-  "/opt/homebrew/Cellar/cmake/3.24.2/share/cmake/Modules/FindDoxygen.cmake"
   "/opt/homebrew/Cellar/cmake/3.24.2/share/cmake/Modules/FindPackageHandleStandardArgs.cmake"
   "/opt/homebrew/Cellar/cmake/3.24.2/share/cmake/Modules/FindPackageMessage.cmake"
   "/opt/homebrew/Cellar/cmake/3.24.2/share/cmake/Modules/FindPython/Support.cmake"
@@ -217,7 +215,6 @@ set(CMAKE_MAKEFILE_PRODUCTS
   "pico-sdk/src/rp2040/CMakeFiles/CMakeDirectoryInformation.cmake"
   "pico-sdk/src/rp2040/hardware_regs/CMakeFiles/CMakeDirectoryInformation.cmake"
   "pico-sdk/src/rp2040/hardware_structs/CMakeFiles/CMakeDirectoryInformation.cmake"
-  "pico-sdk/docs/CMakeFiles/CMakeDirectoryInformation.cmake"
   "lib/lcd/CMakeFiles/CMakeDirectoryInformation.cmake"
   "lib/QMI8658/CMakeFiles/CMakeDirectoryInformation.cmake"
   )
