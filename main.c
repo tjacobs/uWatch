@@ -382,8 +382,8 @@ int8_t pos_matrix_US[] =
 PosMat_t p_us = {3,3,pos_matrix_US};
 PosMat_t p_cn = {4,3,pos_matrix_CN};
 
-#define USA_Old_Glory_Red  0xB0C8
-#define USA_Old_Glory_Blue 0x098C
+#define USA_Old_Glory_Red  0xDDDD
+#define USA_Old_Glory_Blue 0xDDDD
 
 #define CN_Red 0xE8E4
 #define CN_Gold 0xFFE0
@@ -648,7 +648,7 @@ void check_save_data() {
         sprintf(plosa->bat.mode,"GOOD\0");
         printf("bat mode reset to defaults='%s'\n",plosa->bat.mode);
     }
-    if(strstr((char*)plosa->mode,"LOAD")!=plosa->mode) {
+    if(true || strstr((char*)plosa->mode,"LOAD")!=plosa->mode) {
         plosa->dt.year  = default_time.year ;
         plosa->dt.month = default_time.month;
         plosa->dt.day   = default_time.day  ;
@@ -662,7 +662,7 @@ void check_save_data() {
         plosa->highpointer = false;
         plosa->alphapointer = true;
         plosa->pointerdemo = false;
-        plosa->pstyle = PS_NORMAL;
+        plosa->pstyle = PS_ALPHA;
         plosa->clock = true;
         plosa->spin = 0;
         plosa->texture = 0;
@@ -1583,7 +1583,7 @@ void draw_clock_hands() {
         dp0.y=1;
         draw_pointer_mode(dp0,dp0,tu, colt[plosa->theme]->col_s,textures[plosa->texture],BLACK,PS_NORMAL);
     }
-    lcd_blit((int)(x0-8+tcos[seci]*100),(int)(y0-8+tsin[seci]*100),16,16,colt[plosa->theme]->alpha,stars[plosa->theme]);
+    //lcd_blit((int)(x0-8+tcos[seci]*100),(int)(y0-8+tsin[seci]*100),16,16,colt[plosa->theme]->alpha,stars[plosa->theme]);
     //}
 }
 
@@ -1621,7 +1621,7 @@ void draw_gfx() {
     if(bat<10) {
         level_color = colt[plosa->theme]->bat_level_critical;
     }
-    lcd_xline(POS_BAT_X+POS_BAT_PS    ,POS_BAT_Y+POS_BAT_PS,   bat+1, __builtin_bswap16(level_color), POS_BAT_YS-(POS_BAT_PS<<1)); // battery level
+    //lcd_xline(POS_BAT_X+POS_BAT_PS    ,POS_BAT_Y+POS_BAT_PS,   bat+1, __builtin_bswap16(level_color), POS_BAT_YS-(POS_BAT_PS<<1)); // battery level
     if(!usb_loading) {
         sprintf(dbuf,"  %02d%%",bat);
     } else {
