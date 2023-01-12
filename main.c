@@ -134,10 +134,10 @@ void dosave();
 datetime_t default_time = {
     .year  = 2023,
     .month = 1,
-    .day   = 7,
-    .dotw  = 6, // 0 is Sunday
-    .hour  = 16,
-    .min   = 40,
+    .day   = 12,
+    .dotw  = 4, // 0 is Sunday
+    .hour  = 10,
+    .min   = 0,
     .sec   = 0
 };
 
