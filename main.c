@@ -648,7 +648,7 @@ void check_save_data() {
         sprintf(plosa->bat.mode,"GOOD\0");
         printf("bat mode reset to defaults='%s'\n",plosa->bat.mode);
     }
-    if(true || strstr((char*)plosa->mode,"LOAD")!=plosa->mode) {
+    if(strstr((char*)plosa->mode,"LOAD")!=plosa->mode) {
         plosa->dt.year  = default_time.year ;
         plosa->dt.month = default_time.month;
         plosa->dt.day   = default_time.day  ;
@@ -1815,7 +1815,7 @@ void draw_text() {
 
     // Hour
     int hour = plosa->dt.hour;
-    if (hour >= 12) hour -= 12;
+    if (hour > 12) hour -= 12;
     sprintf(dbuf,"%2d", hour);
     lcd_str(POS_TIME_X,       yoff_time, dbuf, &Font24, colors[4], BLACK);
     lcd_str(POS_TIME_X+2*TFW, yoff_time, ":", &Font24, WHITE, BLACK);
