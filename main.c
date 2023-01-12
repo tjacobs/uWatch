@@ -1571,7 +1571,7 @@ void draw_clock_hands() {
         Vec2 v1= {x1,y1};
         lcd_alpha_on();
         //lcd_bez2curve(0,0,(int8_t)(xi/2)+(int8_t)(acc[1]/25.0f),(int8_t)(yi/2)-(int8_t)(acc[0]/25.0f),xi,yi,114,colt[plosa->theme]->col_s,2);
-        lcd_bez2curve(0,0,(int8_t)(xi/2)+(int8_t)get_acc1(),(int8_t)(yi/2)-(int8_t)get_acc0(),xi,yi,114,colt[plosa->theme]->col_s,2);
+        lcd_bez2curve(0,0,(int8_t)(xi/2),(int8_t)(yi/2),xi,yi,114,colt[plosa->theme]->col_s,2);
         lcd_alpha_off();
         if(plosa->pstyle == PS_ALPHA) {
             lcd_alpha_line_deg(v1, tu, 7, colt[plosa->theme]->col_s, 1);
@@ -1598,10 +1598,10 @@ void draw_gfx() {
         return;
     }
     // battery display
-    lcd_frame(POS_BAT_X    ,POS_BAT_Y,   POS_BAT_X+102+(POS_BAT_PS<<1), POS_BAT_Y+POS_BAT_YS, BLUE, POS_BAT_PS); // frame
-    lcd_line(POS_BAT_X-1    ,POS_BAT_Y+1, POS_BAT_X-1    ,POS_BAT_Y+POS_BAT_YS-2,BLUE,1);// round end
-    lcd_line(POS_BAT_X+102+(POS_BAT_PS<<1)    ,POS_BAT_Y+1, POS_BAT_X+102+(POS_BAT_PS<<1)    ,POS_BAT_Y+POS_BAT_YS-2,BLUE,1); //round end
-    lcd_yline(POS_BAT_X+103+(POS_BAT_PS<<1)    ,POS_BAT_Y+POS_BAT_YS/2-2,4,__builtin_bswap16(BLUE),2);  //+
+//    lcd_frame(POS_BAT_X    ,POS_BAT_Y,   POS_BAT_X+102+(POS_BAT_PS<<1), POS_BAT_Y+POS_BAT_YS, BLUE, POS_BAT_PS); // frame
+//    lcd_line(POS_BAT_X-1    ,POS_BAT_Y+1, POS_BAT_X-1    ,POS_BAT_Y+POS_BAT_YS-2,BLUE,1);// round end
+//    lcd_line(POS_BAT_X+102+(POS_BAT_PS<<1)    ,POS_BAT_Y+1, POS_BAT_X+102+(POS_BAT_PS<<1)    ,POS_BAT_Y+POS_BAT_YS-2,BLUE,1); //round end
+//    lcd_yline(POS_BAT_X+103+(POS_BAT_PS<<1)    ,POS_BAT_Y+POS_BAT_YS/2-2,4,__builtin_bswap16(BLUE),2);  //+
     //printf("bat: %f %f %f %f\n",plosa->bat.read,plosa->bat.max, plosa->bat.min, plosa->bat.dif);
     float bat_dif = ( plosa->bat.dif - (plosa->bat.max - plosa->bat.read ) );
     if(bat_dif<0.0f) {
@@ -1625,9 +1625,9 @@ void draw_gfx() {
     if(!usb_loading) {
         sprintf(dbuf,"  %02d%%",bat);
     } else {
-        sprintf(dbuf,"LOADING",bat);
+        sprintf(dbuf,"uWatch",bat);
     }
-    lcd_str(94, 12, dbuf, &Font12, level_color, BLACK);
+//    lcd_str(94, 12, dbuf, &Font12, level_color, BLACK);
 
     if(plosa->sensors) {
         if((plosa->dt.sec==0||plosa->dt.sec==30)&&(!temp_read)) {
@@ -1676,7 +1676,7 @@ void draw_gfx() {
 
         }
     } else {
-        lcd_blit(120-16,120-16,32,32,colt[plosa->theme]->alpha, flags[plosa->theme]); // center
+        //lcd_blit(120-16,120-16,32,32,colt[plosa->theme]->alpha, flags[plosa->theme]); // center
     }
 
     if(plosa->spin!=0) {
@@ -1711,8 +1711,8 @@ void draw_gfx() {
 #define GSPS 4
 #define GSPSZ 20
 
-        lcd_frame(GSPX-GSPS , GSPY-GSPSZ, GSPX+GSPS, GSPY+GSPSZ,WHITE,1); //vert |
-        lcd_frame(GSPX-GSPSZ, GSPY-GSPS, GSPX+GSPSZ,GSPY+GSPS, WHITE,1); //horz –
+//        lcd_frame(GSPX-GSPS , GSPY-GSPSZ, GSPX+GSPS, GSPY+GSPSZ,WHITE,1); //vert |
+//        lcd_frame(GSPX-GSPSZ, GSPY-GSPS, GSPX+GSPSZ,GSPY+GSPS, WHITE,1); //horz –
 //    float fx = (acc[1]/25.0f); // -20 – 20
 //    float fy = (acc[0]/25.0f);
         float fy = get_acc0();
@@ -1742,8 +1742,8 @@ void draw_gfx() {
         uint16_t gdy = (uint16_t)GSPY-gy;
         uint16_t gcoly = __builtin_bswap16(WHITE);
         uint16_t gcolx = __builtin_bswap16(YELLOW);
-        lcd_pixel_rawps(GSPX,gdy,gcoly,GSPS);
-        lcd_pixel_rawps(gdx,GSPY,gcolx,GSPS);
+//        lcd_pixel_rawps(GSPX,gdy,gcoly,GSPS);
+//        lcd_pixel_rawps(gdx,GSPY,gcolx,GSPS);
         if(hg_enabled) {
             gy = (int8_t)get_acc02(hgx,hgy); //(hgx/25.0f);
             gx = (int8_t)get_acc12(hgx,hgy); //(hgy/25.0f);
@@ -1763,8 +1763,8 @@ void draw_gfx() {
             gdx = (uint16_t)GSPX+gx;
             gdy = (uint16_t)GSPY-gy;
             int16_t GSPSs = GSPS-1;
-            lcd_frame(GSPX-GSPSs,gdy -GSPSs,GSPX + GSPSs,gdy  +GSPSs,LGRAY,1);
-            lcd_frame(gdx -GSPSs,GSPY-GSPSs,gdx  + GSPSs,GSPY +GSPSs,ORANGE,1);
+//            lcd_frame(GSPX-GSPSs,gdy -GSPSs,GSPX + GSPSs,gdy  +GSPSs,LGRAY,1);
+//            lcd_frame(gdx -GSPSs,GSPY-GSPSs,gdx  + GSPSs,GSPY +GSPSs,ORANGE,1);
         }
     }
 }
@@ -1773,7 +1773,7 @@ void draw_text() {
     if(!draw_text_enabled) {
         return;
     }
-    if(plosa->sensors) {
+    if(false || plosa->sensors) {
         lcd_str(POS_ACC_X, POS_ACC_Y+  1, "GYR_X =", &Font12, WHITE, BLACK);
         lcd_str(POS_ACC_X, POS_ACC_Y+ 15, "GYR_Y =", &Font12, WHITE, BLACK);
         lcd_str(POS_ACC_X, POS_ACC_Y+ 48, "GYR_Z =", &Font12, WHITE, BLACK);
@@ -1793,36 +1793,41 @@ void draw_text() {
     }
     //sprintf(dbuf, "DPS: %02d",dpsc);
     //lcd_str(120, 220    , dbuf , &Font12, YELLOW,  CYAN);
-    if(!plosa->theme) {
-        convert_cs(week[plosa->theme][plosa->dt.dotw],cn_buffer);
-        lcd_strc(POS_CNDOW_X, POS_CNDOW_Y, cn_buffer, &CNFONT, colors[0], BLACK);
-        //printf("cn_buffer: %s\n",cn_buffer);
-    } else {
-        lcd_str(POS_DOW_X, POS_DOW_Y, week[plosa->theme][plosa->dt.dotw], &TFONT, colors[0], BLACK);
-    }
+
+    lcd_str(POS_DOW_X, POS_DOW_Y, week[plosa->theme][plosa->dt.dotw], &TFONT, colors[0], BLACK);
+
     uint8_t yoff_date = POS_DATE_Y;
     uint8_t yoff_time = POS_TIME_Y;
-    if(plosa->sensors) {
-        //yoff_date+=20;
-        //yoff_time-=20;
-    }
-    sprintf(dbuf,"%02d",plosa->dt.day);
+
+    // Day
+    sprintf(dbuf,"%2d",plosa->dt.day);
     lcd_str(POS_DATE_X+0*TFW, yoff_date, dbuf, &TFONT, colors[1], BLACK);
     lcd_str(POS_DATE_X+2*TFW, yoff_date, ".", &TFONT, WHITE, BLACK);
-    sprintf(dbuf,"%02d",plosa->dt.month);
+
+    // Month
+    sprintf(dbuf,"%2d",plosa->dt.month);
     lcd_str(POS_DATE_X+3*TFW, yoff_date, dbuf, &TFONT, colors[2], BLACK);
     lcd_str(POS_DATE_X+5*TFW, yoff_date, ".", &TFONT, WHITE, BLACK);
+
+    // Year
     sprintf(dbuf,"%04d",plosa->dt.year);
     lcd_str(POS_DATE_X+6*TFW, yoff_date, dbuf, &TFONT, colors[3], BLACK);
 
-    sprintf(dbuf,"%02d",plosa->dt.hour);
-    lcd_str(POS_TIME_X,       yoff_time, dbuf, &TFONT, colors[4], BLACK);
-    lcd_str(POS_TIME_X+2*TFW, yoff_time, ":", &TFONT, WHITE, BLACK);
+    // Hour
+    int hour = plosa->dt.hour;
+    if (hour >= 12) hour -= 12;
+    sprintf(dbuf,"%2d", hour);
+    lcd_str(POS_TIME_X,       yoff_time, dbuf, &Font24, colors[4], BLACK);
+    lcd_str(POS_TIME_X+2*TFW, yoff_time, ":", &Font24, WHITE, BLACK);
+
+    // Min
     sprintf(dbuf,"%02d",plosa->dt.min);
-    lcd_str(POS_TIME_X+3*TFW, yoff_time, dbuf, &TFONT, colors[5], BLACK);
-    lcd_str(POS_TIME_X+5*TFW, yoff_time, ":", &TFONT, WHITE, BLACK);
+    lcd_str(POS_TIME_X+3*TFW, yoff_time, dbuf, &Font24, colors[5], BLACK);
+    lcd_str(POS_TIME_X+5*TFW, yoff_time, ":", &Font24, WHITE, BLACK);
+
+    // Sec
     sprintf(dbuf,"%02d",plosa->dt.sec);
-    lcd_str(POS_TIME_X+6*TFW, yoff_time, dbuf, &TFONT, colors[6], BLACK);
+    lcd_str(POS_TIME_X+6*TFW, yoff_time, dbuf, &Font24, colors[6], BLACK);
 }
 
 int main(void) {
@@ -2079,7 +2084,7 @@ int main(void) {
                     Vec2 vbsz = {190,190};
                     //lcd_blit_deg(vbs,vbe,vbe,flagdeg,backgrounds[plosa->conf_bg],colt[plosa->theme]->alpha,true);
                     Vec2 vbuv = {190,190};
-                    lcd_blit_deg2(vbo,vbuv,vbsz,flagdeg,backgrounds[plosa->conf_bg],colt[plosa->theme]->alpha,true);
+                    //lcd_blit_deg2(vbo,vbuv,vbsz,flagdeg,backgrounds[plosa->conf_bg],colt[plosa->theme]->alpha,true);
 
                     //Vec2 vbs_b= {180+xa,70-ya};
                     //vbs2.x = -35;
@@ -2087,7 +2092,7 @@ int main(void) {
                     //lcd_blit_deg2(vbs2,vbe2,vbe,vbs_b,flagdeg,backgrounds[0],colt[plosa->theme]->alpha);
                     //if(plosa->dither==1){              lcd_dither(EYE_X+xa,EYE_Y-ya,EYE_SZ);            }
                 } else {
-                    lcd_blit(EYE_X+xa,EYE_Y-ya,EYE_SZ,EYE_SZ,BLACK,backgrounds[plosa->conf_bg]);
+                    //lcd_blit(EYE_X+xa,EYE_Y-ya,EYE_SZ,EYE_SZ,BLACK,backgrounds[plosa->conf_bg]);
                 }
             } else {
                 mcpy(b0,backgrounds[plosa->conf_bg],LCD_SZ);
@@ -2498,7 +2503,7 @@ int main(void) {
         //lcd_frame(magx,magy,magx+mags,magy+mags,RED,1);
         //lcd_frame(magx2,magy2,magx2+mags*magf,magy2+mags*magf,RED,1);
 
-        if(draw_flagconfig_enabled) {
+        if(false && draw_flagconfig_enabled) {
             if(plosa->spin!=0) {
                 flagdeg = gdeg(flagdeg+plosa->spin);
             }

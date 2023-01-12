@@ -2,3 +2,4 @@
 .DS_Store
 build
 uf2/main.uf2
+lib/.DS_Store
