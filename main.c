@@ -66,9 +66,6 @@
 #include "img/l3.h"
 #include "img/gt.h"
 
-// Storage buffer
-static __attribute__((section (".noinit")))char losabuf[4096];
-
 // Graphics mode
 typedef enum {
     GFX_NORMAL,
@@ -83,7 +80,7 @@ typedef struct Battery_t {
     float load;
     float max;
     float min;
-    float dif;
+    float diff;
     float read;
 } Battery_t;
 
@@ -122,33 +119,36 @@ typedef struct {
     uint8_t dummy;
     uint8_t save_crc;
 } LOSA_t;
-static LOSA_t* plosa=(LOSA_t*)losabuf;
+static __attribute__((section (".noinit")))char storage[4096];
+static LOSA_t* plosa=(LOSA_t*)storage;
 #define LOSASIZE (&plosa->dummy - &plosa->theme)
 
 // Functions
 uint8_t crc(uint8_t *addr, uint32_t len);
-void sincosf(float,float*,float*);
+void sincosf(float, float*, float*);
 void dosave();
 
 // Start date time
 datetime_t default_time = {
     .year  = 2023,
     .month = 1,
-    .day   = 12,
-    .dotw  = 4, // 0 is Sunday
-    .hour  = 10,
+    .day   = 16,
+    .dotw  = 1, // 0 is Sunday
+    .hour  = 12,
     .min   = 0,
     .sec   = 0
 };
 
 // Spin degrees
 int16_t flagdeg = 90;
+
 int16_t flagdeg1 = 30;
 int16_t flagdeg2 = 60;
 int16_t flagdeg1a = 30;
 int16_t flagdeg2a = 60;
 int16_t flagdeg1b = 130;
 int16_t flagdeg2b = 260;
+
 int16_t fdegs[7] = {90, 30, 60, 30, 60, 130, 260};
 int16_t edeg_fine=270;
 int16_t gdeg_fine=0;
@@ -165,60 +165,51 @@ int16_t b2s=75;
 #define SLEEP_FRAME_ADD   100
 
 // Battery
-Battery_t bat0 = {"GOOD\0", 150.0f, 4.16f, 3.325781f, 4.158838f, 0.0f, 0.0f}; // 150mA
-Battery_t bat1 = {"GOOD\0",1100.0f, 4.19f, 3.346729f, 4.189453f, 0.0f, 0.0f}; //1100ma
+Battery_t bat0 = {"GOOD\0", 150.0f, 4.16f, 3.32f, 4.15f, 0.0f, 0.0f}; // 150mA
 Battery_t* bat_default= &bat0;
 const float conversion_factor = 3.3f / (1 << 12) * 2;
 #define BAT_NUMRES 16
 uint16_t resulti = BAT_NUMRES - 1;
 float result[BAT_NUMRES] = {0.0f};
 float resultsum() {
-    float sum=0.0f;
-    for(uint8_t i=0; i<BAT_NUMRES; i++) {
-        sum+=result[i];
+    float sum = 0.0f;
+    for(uint8_t i = 0; i < BAT_NUMRES; i++) {
+        sum += result[i];
     }
     return sum;
 }
 float resultsummid() {
-    float sum=0.0f;
-    for(uint8_t i=0; i<BAT_NUMRES; i++) {
-        sum+=result[i];
+    float sum = 0.0f;
+    for(uint8_t i = 0; i < BAT_NUMRES; i++) {
+        sum += result[i];
     }
-    return sum/BAT_NUMRES;
-
+    return sum / BAT_NUMRES;
 }
 float resultminmaxmid() {
-    float min=99.0f, max=0.0f;
-    for(uint8_t i=0; i<BAT_NUMRES; i++) {
-        if(result[i]<min) {
-            min=result[i];
-        }
-        if(result[i]>max) {
-            max=result[i];
-        }
+    float min = 99.0f, max = 0.0f;
+    for (uint8_t i = 0; i < BAT_NUMRES; i++) {
+        if (result[i] < min) min = result[i];
+        if (result[i]>max) max = result[i];
     }
-    return (min+max)/2.0f;
+    return (min + max) / 2.0f;
 }
-
 float read_battery() {
-    plosa->bat.read = adc_read()*conversion_factor;
-    if(plosa->bat.read<plosa->bat.load) {
+    plosa->bat.read = adc_read() * conversion_factor;
+    if (plosa->bat.read < plosa->bat.load) {
         //printf("battery_read: %f\n",plosa->bat.read);
-        if(plosa->bat.read>plosa->bat.max) {
-            plosa->bat.max=plosa->bat.read;
-            //printf("battery_max: %f\n",plosa->bat.max);
+        if (plosa->bat.read > plosa->bat.max) plosa->bat.max = plosa->bat.read;
+        if (plosa->bat.read < plosa->bat.min) {
+            plosa->bat.min = plosa->bat.read;
+
+            // Save if battery drops down
+            if (plosa->is_sleeping && plosa->BRIGHTNESS == 0) dosave();
         }
-        if(plosa->bat.read<plosa->bat.min) {
-            plosa->bat.min=plosa->bat.read;
-            if(plosa->is_sleeping && plosa->BRIGHTNESS==0) {
-                dosave();
-            }
-            //printf("battery_min: %f\n",plosa->bat.min);
+
+        // Battery change
+        if (plosa->bat.diff != plosa->bat.max - plosa->bat.min) {
+            printf("battery_diff: %f\n",plosa->bat.diff);
         }
-        if(plosa->bat.dif != (plosa->bat.max-plosa->bat.min)) {
-            //printf("battery_dif: %f\n",plosa->bat.dif);
-        }
-        plosa->bat.dif = plosa->bat.max-plosa->bat.min;
+        plosa->bat.diff = plosa->bat.max - plosa->bat.min;
     }
     return plosa->bat.read;
 }
@@ -615,7 +606,7 @@ void __no_inline_not_in_flash_func(flash_data_load)() {
     uint32_t xip_offset = 0xb0000;
     char *p = (char *)XIP_BASE+xip_offset;
     for(size_t i=0; i<FLASH_SECTOR_SIZE; i++) {
-        losabuf[i]=p[i];
+        storage[i]=p[i];
     }
 }
 
@@ -625,9 +616,9 @@ void __no_inline_not_in_flash_func(flash_data)() {
     char *p = (char *)XIP_BASE+xip_offset;
     uint32_t ints = save_and_disable_interrupts();
     flash_range_erase (xip_offset, FLASH_SECTOR_SIZE);
-    flash_range_program (xip_offset, (uint8_t*)losabuf, FLASH_SECTOR_SIZE);
+    flash_range_program (xip_offset, (uint8_t*)storage, FLASH_SECTOR_SIZE);
     for(size_t i=0; i<FLASH_SECTOR_SIZE; i++) {
-        losabuf[i]=p[i];
+        storage[i]=p[i];
     }
     restore_interrupts(ints);
     printf("FLASHED!\n");
@@ -643,7 +634,7 @@ void check_save_data() {
         plosa->bat.load = bat_default->load;
         plosa->bat.max = bat_default->max;
         plosa->bat.min = bat_default->min;
-        plosa->bat.dif = bat_default->dif;
+        plosa->bat.diff = bat_default->diff;
         plosa->bat.read = bat_default->read;
         sprintf(plosa->bat.mode,"GOOD\0");
         printf("bat mode reset to defaults='%s'\n",plosa->bat.mode);
@@ -1602,18 +1593,16 @@ void draw_gfx() {
 //    lcd_line(POS_BAT_X-1    ,POS_BAT_Y+1, POS_BAT_X-1    ,POS_BAT_Y+POS_BAT_YS-2,BLUE,1);// round end
 //    lcd_line(POS_BAT_X+102+(POS_BAT_PS<<1)    ,POS_BAT_Y+1, POS_BAT_X+102+(POS_BAT_PS<<1)    ,POS_BAT_Y+POS_BAT_YS-2,BLUE,1); //round end
 //    lcd_yline(POS_BAT_X+103+(POS_BAT_PS<<1)    ,POS_BAT_Y+POS_BAT_YS/2-2,4,__builtin_bswap16(BLUE),2);  //+
-    //printf("bat: %f %f %f %f\n",plosa->bat.read,plosa->bat.max, plosa->bat.min, plosa->bat.dif);
-    float bat_dif = ( plosa->bat.dif - (plosa->bat.max - plosa->bat.read ) );
-    if(bat_dif<0.0f) {
-        bat_dif=0.0f;
-    }
-    //printf("(%f)  %f %f [%f]\n",(resultsummid()*conversion_factor),plosa->bat.dif,bat_dif,(bat_dif/plosa->bat.dif)*100.0f);
+    //printf("bat: %f %f %f %f\n",plosa->bat.read,plosa->bat.max, plosa->bat.min, plosa->bat.diff);
+    float bat_diff = ( plosa->bat.diff - (plosa->bat.max - plosa->bat.read));
+    if (bat_diff < 0.0f) bat_diff = 0.0f;
+    //printf("(%f)  %f %f [%f]\n",(resultsummid()*conversion_factor),plosa->bat.diff,bat_diff,(bat_diff/plosa->bat.diff)*100.0f);
 
-    uint16_t bat =  (uint16_t)((bat_dif/plosa->bat.dif)*100.0f);
+    // Battery
+    uint16_t bat = (uint16_t)((bat_diff/  plosa->bat.diff) * 100.0f);
     //printf("bat :  %03d\n",bat);
-    if(bat>100) {
-        bat=100;
-    }
+    if (bat > 100) bat = 100;
+
     uint16_t level_color = colt[plosa->theme]->bat_level;
     if(bat>10&&bat<30) {
         level_color = colt[plosa->theme]->bat_level_low;
