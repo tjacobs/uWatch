@@ -213,17 +213,9 @@ float read_battery() {
     }
     return plosa->bat.read;
 }
-#define BATTERY_MAKFOC_1100mA 4.18f
-#define BATTERY_BERBAS_150mA_loading 4.16f
-#define BATTERY_BERBAS_150mA_max 4.10f
-#define BATTERY_BERBAS_150mA_min 3.80f
-#define BATTERY_V_load BATTERY_BERBAS_150mA_loading
-#define BATTERY_V_max  BATTERY_BERBAS_150mA_max
-#define BATTERY_V_min  BATTERY_BERBAS_150mA_min
-#define BATTERY_V_dif  BATTERY_V_max-BATTERY_V_min
 
 // Memcopy
-#define mcpy(d,s,sz) for(int i=0;i<sz;i++){d[i]=s[i];}
+#define mcpy(d, s, sz) for(int i = 0; i < sz; i++) { d[i] = s[i];}
 
 // Fonts
 #define TFONT Font20
@@ -269,6 +261,7 @@ float read_battery() {
 #define POS_TIME_X 64
 #define POS_TIME_Y 156
 
+// X column widths
 #define TFW 14
 
 // Eye dimensions
@@ -625,7 +618,6 @@ void __no_inline_not_in_flash_func(flash_data)() {
 }
 
 void check_save_data() {
-
     uint8_t acrc = crc(&plosa->theme, LOSASIZE);
     bool crc_status = (acrc==plosa->save_crc);
     sprintf(crcstatus,"CRC: [%02x][%02x] %s\n\0",acrc,plosa->save_crc,(crc_status)?"OK":"ERR");
@@ -1464,8 +1456,8 @@ int16_t draw_getdeg(int16_t deg) {
 }
 
 void draw_init() {
-    doi_config = DOImage_new(240-(32+16), 120-16, 32,32 ,BLACK,config);
-    doi_config_cn = DOImage_new(18, 120-16, 32,32 ,BLACK,config);
+    doi_config = DOImage_new(240-(32+16), 120-16, 32,32, BLACK, config);
+    doi_config_cn = DOImage_new(18, 120-16, 32,32, BLACK, config);
 }
 
 void fx_circle(uint16_t x, uint16_t y, uint16_t r, uint16_t c, uint16_t ps, uint16_t xo, uint16_t yo) {
@@ -1759,10 +1751,11 @@ void draw_gfx() {
 }
 
 void draw_text() {
-    if(!draw_text_enabled) {
-        return;
-    }
-    if(false || plosa->sensors) {
+    // Draw text
+    if (!draw_text_enabled) return;
+
+    // Draw sensors
+    if (plosa->sensors) {
         lcd_str(POS_ACC_X, POS_ACC_Y+  1, "GYR_X =", &Font12, WHITE, BLACK);
         lcd_str(POS_ACC_X, POS_ACC_Y+ 15, "GYR_Y =", &Font12, WHITE, BLACK);
         lcd_str(POS_ACC_X, POS_ACC_Y+ 48, "GYR_Z =", &Font12, WHITE, BLACK);
@@ -1780,163 +1773,138 @@ void draw_text() {
         lcd_str(50, 208, "BAT(V)", &Font16, WHITE, BLACK);
         lcd_floatshort(130, 208, resultsummid(), &Font16, ORANGE, BLACK);
     }
-    //sprintf(dbuf, "DPS: %02d",dpsc);
-    //lcd_str(120, 220    , dbuf , &Font12, YELLOW,  CYAN);
 
+    // Day of the week
     lcd_str(POS_DOW_X, POS_DOW_Y, week[plosa->theme][plosa->dt.dotw], &TFONT, colors[0], BLACK);
 
+    // Day
     uint8_t yoff_date = POS_DATE_Y;
     uint8_t yoff_time = POS_TIME_Y;
-
-    // Day
-    sprintf(dbuf,"%2d",plosa->dt.day);
+    sprintf(dbuf,"%2d", plosa->dt.day);
     lcd_str(POS_DATE_X+0*TFW, yoff_date, dbuf, &TFONT, colors[1], BLACK);
     lcd_str(POS_DATE_X+2*TFW, yoff_date, ".", &TFONT, WHITE, BLACK);
 
     // Month
-    sprintf(dbuf,"%2d",plosa->dt.month);
+    sprintf(dbuf,"%2d", plosa->dt.month);
     lcd_str(POS_DATE_X+3*TFW, yoff_date, dbuf, &TFONT, colors[2], BLACK);
     lcd_str(POS_DATE_X+5*TFW, yoff_date, ".", &TFONT, WHITE, BLACK);
 
     // Year
-    sprintf(dbuf,"%04d",plosa->dt.year);
+    sprintf(dbuf,"%04d", plosa->dt.year);
     lcd_str(POS_DATE_X+6*TFW, yoff_date, dbuf, &TFONT, colors[3], BLACK);
 
     // Hour
     int hour = plosa->dt.hour;
     if (hour > 12) hour -= 12;
-    sprintf(dbuf,"%2d", hour);
+    if (hour == 0) hour = 12;
+    sprintf(dbuf, "%2d", hour);
     lcd_str(POS_TIME_X,       yoff_time, dbuf, &Font24, colors[4], BLACK);
     lcd_str(POS_TIME_X+2*TFW, yoff_time, ":", &Font24, WHITE, BLACK);
 
     // Min
-    sprintf(dbuf,"%02d",plosa->dt.min);
+    sprintf(dbuf,"%02d", plosa->dt.min);
     lcd_str(POS_TIME_X+3*TFW, yoff_time, dbuf, &Font24, colors[5], BLACK);
     lcd_str(POS_TIME_X+5*TFW, yoff_time, ":", &Font24, WHITE, BLACK);
 
     // Sec
-    sprintf(dbuf,"%02d",plosa->dt.sec);
+    sprintf(dbuf,"%02d", plosa->dt.sec);
     lcd_str(POS_TIME_X+6*TFW, yoff_time, dbuf, &Font24, colors[6], BLACK);
 }
 
 int main(void) {
-    plosa->dummy=0;
-    if(strstr((char*)plosa->mode,"SAVE")) {
-        sprintf((char*)plosa->mode,"LOAD");
-        plosa->save_crc = crc(&plosa->theme,LOSASIZE);
+    // Save to flash
+    plosa->dummy = 0;
+    if (strstr((char*)plosa->mode, "SAVE")) {
+        // Save
+        sprintf((char*)plosa->mode, "LOAD");
+        plosa->save_crc = crc(&plosa->theme, LOSASIZE);
         flash_data();
-        sprintf(flashstatus,"flash: saved\0");
+        sprintf(flashstatus, "Flash: saved\0");
     } else {
-        if(!force_no_load && !strstr((char*)plosa->mode,"LOAD")) {
+        // Load from flash
+        if(!force_no_load && !strstr((char*)plosa->mode, "LOAD")) {
             flash_data_load();
-            sprintf(flashstatus,"flash: loaded\0");
+            sprintf(flashstatus,"Flash: loaded\0");
         } else {
-            sprintf(flashstatus,"flash: normal\0");
+            sprintf(flashstatus,"Flash: normal\0");
         }
     }
-    stdio_init_all();
-    //bool init=false;
-    //bool fixed=false;
-    sleep_ms(400);  // reboot takes about 1.6 sec. -> increase time by 2sec, wait 0.4sec
-    check_save_data(); // init
-    //plosa->spin=1;
-    //plosa->gfxmode=GFX_ROTATE;
-    plosa->pointerdemo=false;
-    //plosa->pstyle=2;
-    //plosa->theme=0;
-    //plosa->texture=1;
-    if(plosa->theme==0) {
-        edeg_fine = 270;
-    } else {
-        edeg_fine = 90;
-    }
 
+    // Init
+    stdio_init_all();
+    sleep_ms(400);
+
+    // Check storage
+    check_save_data();
+
+    // Init screen
     lcd_init();
     lcd_setatt(plosa->scandir&0x03);
     lcd_make_cosin();
     draw_init();
     lcd_set_brightness(plosa->BRIGHTNESS);
-    printf("%02d-%02d-%04d %02d:%02d:%02d [%d]\n",plosa->dt.day,plosa->dt.month,plosa->dt.year,plosa->dt.hour,plosa->dt.min,plosa->dt.sec,plosa->dt.dotw);
-    printf("mode='%s'\n",plosa->mode);
-    printf("%s\n",crcstatus);
-    printf("%s\n",flashstatus);
-    printf("LOSASIZE=%d\n",LOSASIZE);
+
+    // Log
+    printf("%02d-%02d-%04d %02d:%02d:%02d [%d]\n", plosa->dt.day, plosa->dt.month, plosa->dt.year, plosa->dt.hour, plosa->dt.min, plosa->dt.sec, plosa->dt.dotw);
+    printf("mode='%s'\n", plosa->mode);
+    printf("%s\n", crcstatus);
+    printf("%s\n", flashstatus);
+
+    // Allocate screen image
     b0 = malloc(LCD_SZ);
-    if(b0==0) {
-        printf("b0==0!\n");
-    }
-    uint32_t o = 0;
+    if (b0 == 0) printf("b0==0!\n");
     lcd_setimg((uint16_t*)b0);
-    //printf("INIT: %b FIXED: %b [%08x] mode='%s'\n",init,fixed,plosa,plosa->mode);
 
-    colt[0]=&colt1;
-    colt[1]=&colt2;
-    colt[2]=&colt3;
-    colt[3]=&colt4;
-    colt[4]=&colt5;
-    colt[5]=&colt6;
+    // Themese
+    colt[0] = &colt2;
+    colt[1] = &colt2;
+    colt[2] = &colt2;
+    colt[3] = &colt2;
+    colt[4] = &colt2;
+    colt[5] = &colt2;
 
-    bool o_clk;
-    bool o_dt;
-    bool o_sw;
 
-    //uint32_t bm = 0b00000000000010110000000000000000;
+    // Init realtime clock
     gpio_set_dir(CBUT0,GPIO_IN);
     gpio_pull_up(CBUT0);
-    //gpio_set_irq_enabled(CBUT0, GPIO_IRQ_LEVEL_LOW, true);
     gpio_set_dir(CBUT1,GPIO_IN);
     gpio_pull_up(CBUT1);
-    //gpio_set_irq_enabled(CBUT1, GPIO_IRQ_LEVEL_LOW, true);
     gpio_set_irq_enabled_with_callback(CCLK, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true, &gpio_callback);
     gpio_set_irq_enabled(CDT, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true);
     gpio_set_irq_enabled(CSW, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true);
     gpio_set_irq_enabled(CBUT0, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true);
     gpio_set_irq_enabled(CBUT1, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true);
-    //gpio_pull_up(CBUT);
-    //i2c_scan();
     rtc_init();
-    printf("init realtime clock\n");
     rtc_set_datetime(&plosa->dt);
-    printf("init realtime clock done\n");
-    if(!(plosa->dt.year%4)) {
-        last[2]=29;
-    }
-    else {
-        last[2]=28;
-    }
+
+    // Leap year
+    if (!(plosa->dt.year % 4)) last[2] = 29;
+    else last[2] = 28;
+
+    // IMU
     QMI8658_init();
     printf("QMI8658_init\r\n");
+    acc[0] = 0.0f;
+    acc[1] = 0.0f;
+    acc[2] = 0.0f;
 
-    //set_colt_colors();
-    //set_dcolors(); // are set from dcolors so set em first
-    //copy_pos_matrix(theme);
-    //command("scan");
-    //command("stat");
-
-    //for(uint16_t i=0;i<360;i++){
-    //  float f = (float)i;
-    //  sincosf(to_rad(f-90),&tsin[i],&tcos[i]);
-    //}
-    //float ff=0.0f;
-    //for(int i=0;i<600;++i){
-    //  sincosf(to_rad(ff-90),&tfsin[i],&tfcos[i]);
-    //  ff+=0.6f;
-    //}
+    // Fonts
     print_font_table();
-    acc[0]=0.0f;
-    acc[1]=0.0f;
-    acc[2]=0.0f;
+
+    // Stats
     command("stat");
 
+    // Main loop
     bool qmis = false;
     while(true) {
+
+        // Read IMU
         qmis = !qmis;
-        if(qmis) {
-            QMI8658_read_xyz(acc, gyro, &tim_count);
-        }
-        //check if not moving
-#define GYRMAX 300.0f
-#define ACCMAX 500.0f
+        if(qmis) QMI8658_read_xyz(acc, gyro, &tim_count);
+
+        // Check if not moving
+        #define GYRMAX 300.0f
+        #define ACCMAX 500.0f
         bool no_moveshake = false;
         if(theme_bg_dynamic_mode==1) {
             if((gyro[0]>-ACCMAX&&gyro[0]<ACCMAX)&&(gyro[1]>-ACCMAX&&gyro[1]<ACCMAX)&&(gyro[2]>-ACCMAX&&gyro[2]<ACCMAX)) {
