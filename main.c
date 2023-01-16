@@ -412,12 +412,7 @@ const uint16_t change_colors[THEMES] = {YELLOW,YELLOW,YELLOW,YELLOW,YELLOW,YELLO
 
 uint8_t theme_bg_dynamic_mode = 0;
 
-ColorTheme_t colt1= {BLACK,CN_Red,CN_Red,CN_Gold,CN_Red,CN_Gold,WHITE,WHITE,WHITE,WHITE,YELLOW,RED};
 ColorTheme_t colt2= {BLACK,USA_Old_Glory_Red,USA_Old_Glory_Blue,NWHITE,USA_Old_Glory_Red,WHITE,WHITE,WHITE,WHITE,WHITE,YELLOW,RED};
-ColorTheme_t colt3= {BLACK,GER_Red,BLACK,GER_Gold,GER_Red,GER_Gold,WHITE,WHITE,WHITE,WHITE,YELLOW,RED};
-ColorTheme_t colt4= {BLACK,TR_Red,TR_Red,TR_White,NWHITE,TR_Red,WHITE,WHITE,WHITE,WHITE,YELLOW,RED};
-ColorTheme_t colt5= {BLACK,GB_Blue,GB_Red,GB_White,NWHITE,GB_Red,WHITE,WHITE,WHITE,WHITE,YELLOW,RED};
-ColorTheme_t colt6= {BLACK,CH_Red,CH_Red,CH_White,NWHITE,GB_Red,WHITE,WHITE,WHITE,WHITE,YELLOW,RED};
 
 ColorTheme_t* colt[THEMES];
 
@@ -621,7 +616,7 @@ void check_save_data() {
     uint8_t acrc = crc(&plosa->theme, LOSASIZE);
     bool crc_status = (acrc==plosa->save_crc);
     sprintf(crcstatus,"CRC: [%02x][%02x] %s\n\0",acrc,plosa->save_crc,(crc_status)?"OK":"ERR");
-    if(strstr((char*)plosa->bat.mode,"GOOD")!=plosa->bat.mode) {
+    if (strstr((char*)plosa->bat.mode,"GOOD") != plosa->bat.mode) {
         plosa->bat.mA = bat_default->mA;
         plosa->bat.load = bat_default->load;
         plosa->bat.max = bat_default->max;
@@ -631,7 +626,7 @@ void check_save_data() {
         sprintf(plosa->bat.mode,"GOOD\0");
         printf("bat mode reset to defaults='%s'\n",plosa->bat.mode);
     }
-    if(strstr((char*)plosa->mode,"LOAD")!=plosa->mode) {
+    if (strstr((char*)plosa->mode,"LOAD") != plosa->mode) {
         plosa->dt.year  = default_time.year ;
         plosa->dt.month = default_time.month;
         plosa->dt.day   = default_time.day  ;
@@ -640,7 +635,7 @@ void check_save_data() {
         plosa->dt.min   = default_time.min  ;
         plosa->dt.sec   = default_time.sec  ;
         plosa->theme = DEFAULT_THEME;
-        plosa->editpos = EDITPOSITIONS; //center
+        plosa->editpos = EDITPOSITIONS;
         plosa->is_sleeping = false;
         plosa->highpointer = false;
         plosa->alphapointer = true;
@@ -1304,30 +1299,29 @@ void command(char* c) {
             plosa->dt.dotw=0;
         }
 
-        printf("\n- STATUS -\n\nmode[8]: %s\n",plosa->mode);
-        printf("dt: %02d:%02d:%04d\r\n",plosa->dt.day,plosa->dt.month,plosa->dt.year);
-        printf("dt: %s %02d:%02d:%02d\r\n",week[plosa->theme][plosa->dt.dotw],plosa->dt.hour,plosa->dt.min,plosa->dt.sec);
-        printf("bat: %s %fmA [%d] %fmax %fmin %fread\r\n", plosa->bat.mode,plosa->bat.mA,(plosa->bat.load)?1:0,plosa->bat.max,plosa->bat.min,plosa->bat.read);
-        printf("editpos: %d\r\n",plosa->editpos);
-        printf("theme: %d\r\n",plosa->theme);
-        printf("BRIGHTNESS : %d\r\n",plosa->BRIGHTNESS);
-
-        printf("is_sleeping: %s\r\n",(plosa->is_sleeping)?"1":"0");
-        printf("sensors: %s\r\n",plosa->sensors?"1":"0");
-        printf("gyrocross: %s\r\n",plosa->gyrocross?"1":"0");
-        printf("bender: %s\r\n",plosa->bender?"1":"0");
-        printf("SMOOTH_BACKGROUND: %s\r\n",plosa->SMOOTH_BACKGROUND?"1":"0");
-        printf("INSOMNIA : %s\r\n",plosa->INSOMNIA?"1":"0");
-        printf("DYNAMIC_CIRCLES: %s\r\n",plosa->DYNAMIC_CIRCLES?"1":"0");
-        printf("DEEPSLEEP: %s\r\n",plosa->DEEPSLEEP?"1":"0");
-        printf("HIGHPOINTER: %s\r\n",plosa->highpointer?"1":"0");
-        printf("%s\r\n",crcstatus);
-        printf("%s\r\n",flashstatus);
+        printf("\n- STATUS -\n");
+        printf("mode: %s\n", plosa->mode);
+        printf("date: %s %02d.%02d.%04d\n", week[plosa->theme][plosa->dt.dotw], plosa->dt.day, plosa->dt.month, plosa->dt.year);
+        printf("time: %02d:%02d:%02d\n", plosa->dt.hour, plosa->dt.min, plosa->dt.sec);
+        printf("battery: %s %.2fmA load: %d min: %.2f max: %.2f read: %.2f\n", plosa->bat.mode, plosa->bat.mA, (plosa->bat.load) ? 1 : 0, plosa->bat.min, plosa->bat.max, plosa->bat.read);
+        printf("theme: %d\n", plosa->theme);
+        printf("editpos: %d\n", plosa->editpos);
+        printf("brightness: %d\n", plosa->BRIGHTNESS);
+        printf("sleeping: %s\n", (plosa->is_sleeping)?"1":"0");
+        printf("sensors: %s\r\n", plosa->sensors?"1":"0");
+        printf("gyrocross: %s\n", plosa->gyrocross?"1":"0");
+        printf("smooth: %s\n", plosa->SMOOTH_BACKGROUND?"1":"0");
+        printf("insomnia: %s\n", plosa->INSOMNIA?"1":"0");
+        printf("circles: %s\n", plosa->DYNAMIC_CIRCLES?"1":"0");
+        printf("deepsleep: %s\n", plosa->DEEPSLEEP?"1":"0");
+        printf("highpointer: %s\n", plosa->highpointer?"1":"0");
+        //printf("%s\n", crcstatus);
+        printf("%s\n", flashstatus);
     }
 
-    if(strstr(left,"reboot")) {
-        reset_usb_boot(0,0);
-    }
+    // Reboot
+    if (strstr(left, "reboot")) reset_usb_boot(0, 0);
+
     if(strstr(left,"SNAPSHOT")) {
         //printf("-----------------------> CUT HERE <---------------------\n\nuint8_t imagedata[138+  240*240*2] = {\n");
         if(b0==NULL) {
@@ -1819,14 +1813,14 @@ int main(void) {
         sprintf((char*)plosa->mode, "LOAD");
         plosa->save_crc = crc(&plosa->theme, LOSASIZE);
         flash_data();
-        sprintf(flashstatus, "Flash: saved\0");
+        sprintf(flashstatus, "flash: saved\0");
     } else {
         // Load from flash
         if(!force_no_load && !strstr((char*)plosa->mode, "LOAD")) {
             flash_data_load();
-            sprintf(flashstatus,"Flash: loaded\0");
+            sprintf(flashstatus,"flash: loaded\0");
         } else {
-            sprintf(flashstatus,"Flash: normal\0");
+            sprintf(flashstatus,"flash: normal\0");
         }
     }
 
@@ -1855,14 +1849,13 @@ int main(void) {
     if (b0 == 0) printf("b0==0!\n");
     lcd_setimg((uint16_t*)b0);
 
-    // Themese
+    // Themes
     colt[0] = &colt2;
     colt[1] = &colt2;
     colt[2] = &colt2;
     colt[3] = &colt2;
     colt[4] = &colt2;
     colt[5] = &colt2;
-
 
     // Init realtime clock
     gpio_set_dir(CBUT0,GPIO_IN);
