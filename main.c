@@ -165,7 +165,7 @@ int16_t b2s=75;
 #define SLEEP_FRAME_ADD   100
 
 // Battery
-Battery_t bat0 = {"GOOD\0", 150.0f, 4.16f, 3.32f, 4.15f, 0.0f, 0.0f}; // 150mA
+Battery_t bat0 = {"\0", 150.0f, 4.16f, 3.32f, 4.15f, 0.0f, 0.0f}; // 150mA
 Battery_t* bat_default= &bat0;
 const float conversion_factor = 3.3f / (1 << 12) * 2;
 #define BAT_NUMRES 16
@@ -364,36 +364,19 @@ int8_t pos_matrix_US[] =
 };
 
 PosMat_t p_us = {3,3,pos_matrix_US};
-PosMat_t p_cn = {4,3,pos_matrix_CN};
 
 #define USA_Old_Glory_Red  0xDDDD
 #define USA_Old_Glory_Blue 0xDDDD
 
-#define CN_Red 0xE8E4
-#define CN_Gold 0xFFE0
-
-#define GER_Gold 0xFE60
-#define GER_Red 0xF800
-
-#define TR_Red 0xF800
-#define TR_White 0xFFFF
-
-#define GB_Blue 0x010D
-#define GB_Red  0xC885
-#define GB_White 0xFFFF
-
-#define CH_Red 0xD943
-#define CH_White 0xFFFF
-
-#define THEMES 6
+#define THEMES 1
 
 CMode cmode = CM_None;
 int16_t xold, xoldt;
 int16_t yold, yoldt;
 
-const PosMat_t* positions[THEMES] = {&p_cn,&p_us,&p_us,&p_us,&p_us,&p_us};
-const uint8_t* flags[THEMES] = {cn32,usa32,ger32,tr32,flag_gb32,flag_ch32};
-const uint8_t* stars[THEMES] = {cn16,usa16,ger16,tr16,flag_gb16,flag_ch16};
+const PosMat_t* positions[THEMES] = {&p_us};
+const uint8_t* flags[THEMES] = {usa32};
+const uint8_t* stars[THEMES] = {usa16};
 
 #define MAX_BG 5
 #define TEXTURES 5
@@ -407,12 +390,12 @@ const int16_t bg_size[MAX_BG] = {190,190,240,240,240};
 
 const bool bg_dynamic[MAX_BG] = {true,true,false,false,false};
 
-const uint16_t edit_colors[THEMES] = {ORANGE,YELLOW,ORANGE,ORANGE,ORANGE,ORANGE};
-const uint16_t change_colors[THEMES] = {YELLOW,YELLOW,YELLOW,YELLOW,YELLOW,YELLOW};
+const uint16_t edit_colors[THEMES] = {ORANGE};
+const uint16_t change_colors[THEMES] = {YELLOW};
 
 uint8_t theme_bg_dynamic_mode = 0;
 
-ColorTheme_t colt2= {BLACK,USA_Old_Glory_Red,USA_Old_Glory_Blue,NWHITE,USA_Old_Glory_Red,WHITE,WHITE,WHITE,WHITE,WHITE,YELLOW,RED};
+ColorTheme_t colt2= {BLACK, USA_Old_Glory_Red, USA_Old_Glory_Blue, NWHITE,USA_Old_Glory_Red, WHITE, WHITE, WHITE, WHITE, WHITE, YELLOW, RED};
 
 ColorTheme_t* colt[THEMES];
 
@@ -494,7 +477,6 @@ uint8_t comc;
 
 uint8_t* b0=NULL;
 
-//shell vars!
 int16_t bcx0 = 80;
 int16_t bcy0 = 80;
 int16_t bcx1 = 80;
@@ -506,12 +488,10 @@ int16_t tpox = 22;
 int16_t tpol = -22;
 int16_t tpor = 22;
 
-//ky-040
 #define CCLK 16
 #define CDT 17
 #define CSW 19
 
-//one button /
 #define CBUT0 22
 #define CBUT1 3
 uint32_t nopvar;
@@ -560,11 +540,9 @@ bool draw_gfx_enabled = true;
 bool draw_config_enabled = false;
 bool draw_flagconfig_enabled = false;
 
-// config symbol
 DOImage* doi_config;
-DOImage* doi_config_cn;
 
-DOImage** adoi_config[THEMES] = {&doi_config_cn,&doi_config,&doi_config,&doi_config,&doi_config,&doi_config};
+DOImage** adoi_config[THEMES] = {&doi_config};
 
 float acc[3], gyro[3];
 unsigned int tim_count = 0;
@@ -574,15 +552,8 @@ uint16_t cn_chars=0;
 char ftst[128*4] = {0};
 
 char* week_usa[7] = {"Sun\0","Mon\0","Tue\0","Wed\0","Thu\0","Fri\0","Sat\0"};
-char* week_gb[7] = {"Sun\0","Mon\0","Tue\0","Wed\0","Thu\0","Fri\0","Sat\0"};
-char* week_cn[7] = {"星期日\0","星期一\0","星期二\0","星期三\0","星期四\0","星期五\0","星期六\0"};
-char* week_ger[7] = {"Son\0","Mon\0","Die\0","Mit\0","Don\0","Fre\0","Sam\0"};
-char* week_ch[7] = {"Son\0","Mon\0","Die\0","Mit\0","Don\0","Fre\0","Sam\0"};
-char* week_tr[7] = {"PAZ\0","PZT\0","SAL\0","CAR\0","PER\0","CUM\0","CMT\0"};
-char** week[THEMES] = {week_cn,week_usa,week_ger,week_tr,week_gb,week_ch};
+char** week[THEMES] = {week_usa};
 uint8_t last[13] = {0,31,28,31,30,31,30,31,31,30,31,30,31};
-
-char cn_buffer[32] = {0};
 
 bool do_reset = true;
 bool force_no_load = true;
@@ -721,16 +692,16 @@ uint8_t crc(uint8_t *addr, uint32_t len) {
         uint8_t i;
         uint8_t in_byte = *addr++;
         for (i = 8; i != 0; i--) {
-            uint8_t carry = (crc ^ in_byte ) & 0x80;        /* set carry */
-            crc <<= 1;                                      /* left shift 1 */
+            uint8_t carry = (crc ^ in_byte ) & 0x80;
+            crc <<= 1;
             if (carry != 0) {
                 crc ^= 0x7;
             }
-            in_byte <<= 1;                                  /* left shift 1 */
+            in_byte <<= 1;
         }
-        len--;                                              /* len-- */
+        len--;
     }
-    return crc;                                               /* return crc */
+    return crc;
 }
 
 void empty_deinit() {
@@ -784,128 +755,6 @@ void set_colt_colors() {
     dcolors[6]=colt[plosa->theme]->col_time;
     dcolors[7]=colt[plosa->theme]->col_time;
 }
-
-uint8_t find_cc(uint8_t a, uint8_t b, uint8_t c) {
-    uint fo=0;
-    for(int i=0; i<cn_chars+1; i++) {
-        //printf("[%02x%02x%02x] %02x %02x %02x\n",a,b,c,ftst[fo],ftst[fo+1],ftst[fo+2]);
-        if( (ftst[fo+0]==a) && (ftst[fo+1]==b) && (ftst[fo+2]==c) ) {
-            //printf("find_cc: %d %d\n",i,i+228);
-            return i;
-        }
-        fo+=4;
-    }
-}
-
-void convert_cs(char* source, char* target) {
-    uint32_t si=0, ti=0;
-    while(source[si]) {
-        //printf("%02x %02x %02x\n",source[si],source[si+1],source[si+2]);
-        target[ti]=find_cc(source[si],source[si+1],source[si+2]);
-        //printf("%d [%d]\n",target[ti],target[ti]+228);
-        si+=3;
-        target[ti]+=(256-32);
-        ++ti;
-        target[ti]+='\n';
-    }
-    target[ti]=0;
-}
-
-void print_font_table() {
-    uint8_t fts=0;
-    uint8_t n=0;
-    uint8_t nbytes=0;
-    uint32_t ft[128];
-    uint32_t sti=0;
-    char ftc[5] = {0};
-    uint8_t cbu[5];
-    printf("TESTING...");
-    printf("symcheck\n");
-    char* pc;
-    for(int i=0; i<7; i++) {
-        int c=0;
-        pc = week_cn[i];
-        while(pc[c]) {
-            n=pc[c];
-
-            if((0b10000000&n)==0b00000000) {
-                nbytes=1;
-            }
-            if((0b11100000&n)==0b11000000) {
-                nbytes=2;
-            }
-            if((0b11110000&n)==0b11100000) {
-                nbytes=3;
-            }
-            if((0b11111000&n)==0b11110000) {
-                nbytes=4;
-            }
-            //printf("n=%02x (%02b) [%d]",n,(n&0b10000000),nbytes);
-            switch(nbytes) {
-            case 1:
-                ft[fts]=n;
-                c+=1;
-                break;
-            case 2:
-                ft[fts]=(pc[c+1]<<8)+(pc[c+0]);
-                c+=2;
-                break;
-            case 3:
-                ft[fts]=(pc[c+0]<<16)+(pc[c+1]<<8) +(pc[c+2]);
-                c+=3;
-                break;
-            case 4:
-                ft[fts]=(pc[c+0]<<24)+(pc[c+1]<<16)+(pc[c+2]<<8)+(pc[c+3]);
-                c+=4;
-            }
-            //printf("ft=%d\n",ft[fts]);
-            bool dupe=false;
-            for(int j=0; j<fts; j++) {
-                if(ft[j]==ft[fts]) {
-                    dupe=true;
-                    break;
-                }
-            }
-            if(!dupe) {
-                ++fts;
-            }
-        }
-    }
-
-    uint32_t i,k;
-    uint32_t temp;
-
-    n=fts;
-    for(i = 0; i<n-1; i++) {
-        for(k = 0; k<n-1-i; k++) {
-            if(ft[k] > ft[k+1]) {
-                temp = ft[k];
-                ft[k] = ft[k+1];
-                ft[k+1] = temp;
-            }
-        }
-    }
-    pc=(char*)&ft[0];
-    sti=0;
-    for(i=0; i<fts; i++) {
-        //printf("%02d : %d %02x %02x %02x %02x\n",i,ft[i],pc[0],pc[1],pc[2],pc[3]);
-        ftc[0]=pc[2];
-        ftc[1]=pc[1];
-        ftc[2]=pc[0];
-        ftc[3]=pc[3];
-        printf("S: %02x %02x %02x %s\n",ftc[0],ftc[1],ftc[2],ftc);
-        ftst[sti+0]=ftc[0];
-        ftst[sti+1]=ftc[1];
-        ftst[sti+2]=ftc[2];
-        ftst[sti+3]='\n';
-        pc+=4;
-        sti+=4;
-    }
-    ftst[sti]=0;
-    printf("CHARLIST:\n%s\n",ftst);
-    cn_chars=fts;
-}
-
 
 bool reserved_addr(uint8_t addr) {
     return (addr & 0x78) == 0 || (addr & 0x78) == 0x78;
@@ -1451,7 +1300,6 @@ int16_t draw_getdeg(int16_t deg) {
 
 void draw_init() {
     doi_config = DOImage_new(240-(32+16), 120-16, 32,32, BLACK, config);
-    doi_config_cn = DOImage_new(18, 120-16, 32,32, BLACK, config);
 }
 
 void fx_circle(uint16_t x, uint16_t y, uint16_t r, uint16_t c, uint16_t ps, uint16_t xo, uint16_t yo) {
@@ -1880,9 +1728,6 @@ int main(void) {
     acc[0] = 0.0f;
     acc[1] = 0.0f;
     acc[2] = 0.0f;
-
-    // Fonts
-    print_font_table();
 
     // Stats
     command("stat");
