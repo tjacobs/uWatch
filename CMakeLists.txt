@@ -17,6 +17,7 @@ include_directories(./lib/QMI8658)
 # Main
 add_executable(main
   main.c
+  utils.c
   lib/draw.c
 )
 
