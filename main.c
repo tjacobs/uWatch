@@ -34,6 +34,7 @@
 
 #include "img/Font34.h"
 #include "img/Font30.h"
+#include "img/FontAvenir40.h"
 #include "img/bega.h"
 #include "img/sand.h"
 #include "img/col1.h"
@@ -1523,17 +1524,17 @@ void draw_text() {
     if (hour > 12) hour -= 12;
     if (hour == 0) hour = 12;
     sprintf(dbuf, "%2d", hour);
-    lcd_str(POS_TIME_X,       yoff_time, dbuf, &Font24, colors[4], BLACK);
-    lcd_str(POS_TIME_X+2*TFW, yoff_time, ":", &Font24, WHITE, BLACK);
+    lcd_str(POS_TIME_X,       yoff_time, dbuf, &FontAvenir40, colors[4], BLACK);
+    lcd_str(POS_TIME_X+2*TFW, yoff_time, ":", &FontAvenir40, WHITE, BLACK);
 
     // Min
     sprintf(dbuf,"%02d", plosa->dt.min);
-    lcd_str(POS_TIME_X+3*TFW, yoff_time, dbuf, &Font24, colors[5], BLACK);
-    lcd_str(POS_TIME_X+5*TFW, yoff_time, ":", &Font24, WHITE, BLACK);
+    lcd_str(POS_TIME_X+3*TFW, yoff_time, dbuf, &FontAvenir40, colors[5], BLACK);
+    lcd_str(POS_TIME_X+5*TFW, yoff_time, ":", &FontAvenir40, WHITE, BLACK);
 
     // Sec
     sprintf(dbuf,"%02d", plosa->dt.sec);
-    lcd_str(POS_TIME_X+6*TFW, yoff_time, dbuf, &Font24, colors[6], BLACK);
+    lcd_str(POS_TIME_X+6*TFW, yoff_time, dbuf, &FontAvenir40, colors[6], BLACK);
 }
 
 int main(void) {
