@@ -57,6 +57,7 @@
 #include "img/gt.h"
 
 // Utils
+void shell();
 void i2c_read();
 void i2c_scan();
 
