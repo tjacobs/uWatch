@@ -255,7 +255,7 @@ float read_battery() {
 #define POS_CNDOW_Y 72
 
 #define POS_TIME_X 64
-#define POS_TIME_Y 156
+#define POS_TIME_Y 120
 
 // X column widths
 #define TFW 14
@@ -1524,17 +1524,17 @@ void draw_text() {
     if (hour > 12) hour -= 12;
     if (hour == 0) hour = 12;
     sprintf(dbuf, "%2d", hour);
-    lcd_str(POS_TIME_X,       yoff_time, dbuf, &FontAvenir40, colors[4], BLACK);
-    lcd_str(POS_TIME_X+2*TFW, yoff_time, ":", &FontAvenir40, WHITE, BLACK);
+    lcd_str(POS_TIME_X*0,     yoff_time, dbuf, &FontAvenir40, colors[4], BLACK);
+    lcd_str(POS_TIME_X+1*TFW, yoff_time, ":", &FontAvenir40, WHITE, BLACK);
 
     // Min
     sprintf(dbuf,"%02d", plosa->dt.min);
     lcd_str(POS_TIME_X+3*TFW, yoff_time, dbuf, &FontAvenir40, colors[5], BLACK);
-    lcd_str(POS_TIME_X+5*TFW, yoff_time, ":", &FontAvenir40, WHITE, BLACK);
+    lcd_str(POS_TIME_X+7*TFW, yoff_time, ":", &FontAvenir40, WHITE, BLACK);
 
     // Sec
     sprintf(dbuf,"%02d", plosa->dt.sec);
-    lcd_str(POS_TIME_X+6*TFW, yoff_time, dbuf, &FontAvenir40, colors[6], BLACK);
+    lcd_str(POS_TIME_X+6*TFW, yoff_time + 30, dbuf, &FontAvenir40, colors[6], BLACK);
 }
 
 int main(void) {
