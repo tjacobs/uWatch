@@ -1496,9 +1496,10 @@ void draw_text() {
         lcd_float(POS_ACC_X+70, POS_ACC_Y+130, gyro[1], &Font12, YELLOW, BLACK);
         lcd_float(POS_ACC_X+70, POS_ACC_Y+144, gyro[2], &Font12, YELLOW, BLACK);
         lcd_float(POS_ACC_X+70, POS_ACC_Y+156, temperature, &Font12,  YELLOW, BLACK);
-        lcd_str(50, 208, "BAT(V)", &Font16, WHITE, BLACK);
-        lcd_floatshort(130, 208, resultsummid(), &Font16, ORANGE, BLACK);
     }
+
+    lcd_str(50, 208, "BAT(V)", &Font16, WHITE, BLACK);
+    lcd_floatshort(130, 208, resultsummid(), &Font16, ORANGE, BLACK);
 
     // Day of the week
     lcd_str(POS_DOW_X, POS_DOW_Y, week[plosa->theme][plosa->dt.dotw], &TFONT, colors[0], BLACK);
