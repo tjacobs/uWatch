@@ -474,10 +474,6 @@ char timebuffer[16] = {0};
 char* ptimebuffer=timebuffer;
 bool h24=true;
 
-uint16_t comi=0;
-char combufa[256]= {0};
-int16_t comt;
-uint8_t comc;
 
 uint8_t* b0=NULL;
 
@@ -688,24 +684,6 @@ void check_save_data() {
         //rtc_set_datetime(&plosa->dt);
         printf("MODE:='%s'\n",plosa->mode);
     }
-}
-
-uint8_t crc(uint8_t *addr, uint32_t len) {
-    uint8_t crc = 0;
-    while (len != 0) {
-        uint8_t i;
-        uint8_t in_byte = *addr++;
-        for (i = 8; i != 0; i--) {
-            uint8_t carry = (crc ^ in_byte ) & 0x80;
-            crc <<= 1;
-            if (carry != 0) {
-                crc ^= 0x7;
-            }
-            in_byte <<= 1;
-        }
-        len--;
-    }
-    return crc;
 }
 
 void empty_deinit() {
@@ -1131,27 +1109,6 @@ void command(char* c) {
         }
         stdio_flush();
         //stdio_usb_init();
-    }
-}
-
-void shell() {
-    // shell
-    comt=getchar_timeout_us(100);
-    while(comt!=PICO_ERROR_TIMEOUT) {
-        comc=comt&0xff;
-        //putchar(comc);
-        combufa[comi++]=comc;
-        if(comc=='\n') {
-            combufa[comi]=0;
-            combufa[comi-1]=0;
-            //printf("CMD: %s\n",combufa);
-            command(&combufa[0]);
-            comi=0;
-        }
-        if(comi==254) {
-            comi=0;
-        }
-        comt=getchar_timeout_us(100);
     }
 }
 
