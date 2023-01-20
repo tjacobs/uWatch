@@ -34,7 +34,7 @@
 
 #include "img/Font34.h"
 #include "img/Font30.h"
-#include "img/FontAvenir40.h"
+#include "img/FontAvenir60.h"
 #include "img/bega.h"
 #include "img/sand.h"
 #include "img/col1.h"
@@ -123,6 +123,129 @@ static LOSA_t* plosa=(LOSA_t*)storage;
 uint8_t crc(uint8_t *addr, uint32_t len);
 void sincosf(float, float*, float*);
 void dosave();
+
+// GPIO buttons
+#define CBUT0 22
+#define CBUT1 3
+bool fire_pressed = false;
+bool fire = false;
+bool ceasefire = false;
+
+uint32_t nopvar;
+bool analog_seconds=false;
+uint32_t fire_counter=0;
+
+bool tcw = false;
+bool tccw = false;
+bool clk,dt,sw,oclk,odt,osw;
+bool temp_read=false;
+int gc=0;
+char gch;
+char gbuf[2] = {'c','d'};
+uint32_t last_wait;
+uint32_t stime;
+uint8_t tseco;
+#define LOOPWAIT 50
+#define HOURGLASSBORDER 200 // minimum rise/fall of acc_x
+#define HOURGLASS 1000*(100/LOOPWAIT)  // rise/fall of acc_x border till switch (cw/ccw)
+int16_t hourglass_x = HOURGLASS;
+int16_t hourglass_y = HOURGLASS;
+#define CCLK 16
+#define CDT 17
+#define CSW 19
+
+// Button presses
+#define MS 1000
+#define US 1000000
+#define BUTD 500
+#define REBOOT US * 3
+uint32_t rebootcounter = 0;
+uint32_t rebootcounter_prev = 0;
+uint32_t button0_time = 0;
+uint32_t button1_time = 0;
+uint32_t button0_diff = 0;
+uint32_t button1_diff = 0;
+
+void gpio_callback(uint gpio, uint32_t events) {
+    // Press
+    if (events & GPIO_IRQ_EDGE_RISE) {
+        // Buttons
+        if (gpio == CBUT0) {
+            ceasefire = true;
+            fire_pressed = false;
+            rebootcounter = 0;
+        }
+        if (gpio == CBUT1) {
+            ceasefire = true;
+            fire_pressed = false;
+            rebootcounter = 0;
+        }
+
+        // Switch
+        if (gpio == CSW) {
+            osw = true;
+        }
+        if (gpio == CCLK) {
+            gch = 'c';
+        }
+        if (gpio == CDT) {
+            gch = 'd';
+        }
+        gbuf[0] = gbuf[1];
+        gbuf[1] = gch;
+    }
+
+    // Release
+    if (events & GPIO_IRQ_EDGE_FALL) {
+        if (gpio==CBUT0) {
+            //ceasefire = false;
+        }
+        if (gpio==CBUT1) {
+            //ceasefire = false;
+        }
+        if (gpio==CBUT0 && !fire && (((time_us_32()-button0_time)/MS)>=BUTD)) {
+            ceasefire = false;
+            fire_pressed = true;
+            fire = true;
+            button0_time = time_us_32();
+        }
+        if (gpio == CBUT1 && !fire && (((time_us_32()-button1_time)/MS)>=BUTD)) {
+            ceasefire = false;
+            fire_pressed = true;
+            fire = true;
+            button1_time = time_us_32();
+        }
+
+        // Switch
+        if (gpio == CSW) {
+            sw = true;
+        }
+        if (gpio == CCLK) {
+            gch = 'C';
+        }
+        if (gpio==CDT) {
+            gch = 'D';
+        }
+        gbuf[0] = gbuf[1];
+        gbuf[1] = gch;
+    }
+
+    // Switch
+    if(gbuf[0]=='C'&&gbuf[1]=='D') {
+        tcw = true;
+    }
+    if(gbuf[0]=='D'&&gbuf[1]=='C') {
+        tccw = true;
+    }
+    if(sw) {
+        sw = false;
+        fire = true;
+    }
+    if(osw) {
+        osw = false;
+        //ceasefire=true;
+    }
+}
 
 // Start date time
 datetime_t default_time = {
@@ -220,11 +343,8 @@ float read_battery() {
 #define EYE irisa190
 
 #define FRAME_DELAY 50
-#define LOOPWAIT 50
 
 #define DRAW_GFX_FIRST true //1 == text floating above clock
-#define HOURGLASSBORDER 200 // minimum rise/fall of acc_x
-#define HOURGLASS 1000*(100/LOOPWAIT)  // rise/fall of acc_x border till switch (cw/ccw)
 #define BUTTONGLASSC 300
 #define BUTTONGLASS 1400
 #define SCRSAV 15*(100/LOOPWAIT)
@@ -480,30 +600,6 @@ int16_t tpox = 22;
 int16_t tpol = -22;
 int16_t tpor = 22;
 
-#define CCLK 16
-#define CDT 17
-#define CSW 19
-
-#define CBUT0 22
-#define CBUT1 3
-uint32_t nopvar;
-bool fire_pressed=false;
-bool analog_seconds=false;
-uint32_t fire_counter=0;
-bool fire=false;
-bool ceasefire=false;
-bool tcw=false;
-bool tccw=false;
-bool clk,dt,sw,oclk,odt,osw;
-bool temp_read=false;
-int gc=0;
-char gch;
-char gbuf[2] = {'c','d'};
-uint32_t last_wait;
-uint32_t stime;
-uint8_t tseco;
-int16_t hourglass_x=HOURGLASS;
-int16_t hourglass_y=HOURGLASS;
 
 bool hg_enabled=false;
 int16_t hgx=0;
@@ -734,108 +830,6 @@ bool reserved_addr(uint8_t addr) {
     return (addr & 0x78) == 0 || (addr & 0x78) == 0x78;
 }
 
-#define MS 1000
-#define US 1000000
-#define BUTD 500  // delay between possible button presses (default: 500, half of a second)
-#define REBOOT US*3 // 30 second/10
-uint32_t rebootcounter = 0;
-uint32_t rebootcounterold = 0;
-uint32_t button0_time=0;
-uint32_t button1_time=0;
-uint32_t button0_dif=0;
-uint32_t button1_dif=0;
-
-void gpio_callback(uint gpio, uint32_t events) {
-    if(events&GPIO_IRQ_EDGE_RISE) {
-        if(gpio==CSW) {
-            osw=true;
-        }
-        if(gpio==CCLK) {
-            gch='c';
-        }
-        if(gpio==CDT) {
-            gch='d';
-        }
-        if(gpio==CBUT0) {
-            ceasefire=true;
-            fire_pressed=false;
-            rebootcounter=0;
-        }
-        if(gpio==CBUT1) {
-            ceasefire=true;
-            fire_pressed=false;
-            rebootcounter=0;
-        }
-
-        gbuf[0]=gbuf[1];
-        gbuf[1]=gch;
-    }
-
-    if(events&GPIO_IRQ_EDGE_FALL) {
-        if(gpio==CSW) {
-            sw=true;
-        }
-        if(gpio==CCLK) {
-            gch='C';
-        }
-        if(gpio==CDT) {
-            gch='D';
-        }
-        //if(gpio==CBUT0){
-        //  printf("tus: %d\n",time_us_32());
-        //  printf("b0t: %d\n",button0_time);
-        //}
-        if(gpio==CBUT0 && !fire && (((time_us_32()-button0_time)/MS)>=BUTD)) {
-            ceasefire=false;
-            fire=true;
-            button0_time = time_us_32();
-            fire_pressed=true;
-        }
-        if(gpio==CBUT1 && !fire && (((time_us_32()-button1_time)/MS)>=BUTD)) {
-            ceasefire=false;
-            fire=true;
-            button1_time = time_us_32();
-            fire_pressed=true;
-        }
-        gbuf[0]=gbuf[1];
-        gbuf[1]=gch;
-    }
-
-    //if(events&GPIO_IRQ_LEVEL_LOW && gpio==CBUT0){
-    //  buttonglass-=BUTTONGLASSC;
-    //  if(buttonglass<=0){
-    //    fire=true;
-    //    if(plosa->editpos == 0){rebootcounter++;}
-    //    buttonglass=BUTTONGLASS;
-    //  }
-    //}
-
-    //if(events&GPIO_IRQ_LEVEL_LOW && gpio==CBUT1){
-    //  buttonglass-=BUTTONGLASSC;
-    //  if(buttonglass<=0){
-    //    fire=true;
-    //    if(plosa->editpos == 0){rebootcounter++;}
-    //    buttonglass=BUTTONGLASS;
-    //  }
-    //}
-
-    if(gbuf[0]=='C'&&gbuf[1]=='D') {
-        tcw=true;
-    }
-    if(gbuf[0]=='D'&&gbuf[1]=='C') {
-        tccw=true;
-    }
-    if(sw) {
-        sw=false;
-        fire=true;
-    }
-    if(osw) {
-        osw=false;
-        ceasefire=true;
-    }
-
-
-}
 char C_SET[4]="set ";
 char C_GET[4]="get ";
 extern uint16_t drawlines;
@@ -1498,6 +1492,11 @@ void draw_text() {
         lcd_float(POS_ACC_X+70, POS_ACC_Y+156, temperature, &Font12,  YELLOW, BLACK);
     }
 
+    // Button status
+    sprintf(dbuf,"%d %d %d", ceasefire, fire, fire_pressed);
+    lcd_str(100, 190, dbuf, &TFONT, colors[2], BLACK);
+
+    // Battery
     lcd_str(50, 208, "BAT(V)", &Font16, WHITE, BLACK);
     lcd_floatshort(130, 208, resultsummid(), &Font16, ORANGE, BLACK);
 
@@ -1525,17 +1524,17 @@ void draw_text() {
     if (hour > 12) hour -= 12;
     if (hour == 0) hour = 12;
     sprintf(dbuf, "%2d", hour);
-    lcd_str(POS_TIME_X*0,     yoff_time, dbuf, &FontAvenir40, colors[4], BLACK);
-    lcd_str(POS_TIME_X+1*TFW, yoff_time, ":", &FontAvenir40, WHITE, BLACK);
+    lcd_str(POS_TIME_X*0,     yoff_time, dbuf, &FontAvenir60, colors[4], BLACK);
+    lcd_str(POS_TIME_X+1*TFW, yoff_time, ":", &FontAvenir60, WHITE, BLACK);
 
     // Min
     sprintf(dbuf,"%02d", plosa->dt.min);
-    lcd_str(POS_TIME_X+3*TFW, yoff_time, dbuf, &FontAvenir40, colors[5], BLACK);
-    lcd_str(POS_TIME_X+7*TFW, yoff_time, ":", &FontAvenir40, WHITE, BLACK);
+    lcd_str(POS_TIME_X+3*TFW, yoff_time, dbuf, &FontAvenir60, colors[5], BLACK);
+    lcd_str(POS_TIME_X+7*TFW, yoff_time, ":", &FontAvenir60, WHITE, BLACK);
 
     // Sec
-    sprintf(dbuf,"%02d", plosa->dt.sec);
-    lcd_str(POS_TIME_X+6*TFW, yoff_time + 30, dbuf, &FontAvenir40, colors[6], BLACK);
+    //sprintf(dbuf,"%02d", plosa->dt.sec);
+    //lcd_str(POS_TIME_X+6*TFW, yoff_time + 30, dbuf, &FontAvenir60, colors[6], BLACK);
 }
 
 int main(void) {
@@ -1687,23 +1686,24 @@ int main(void) {
             continue;
         }
 
-        if(fire_pressed) {
+        // Fire pressed
+        if (fire_pressed) {
             uint32_t t = time_us_32();
             if(button0_time) {
-                button0_dif = t-button0_time;
+                button0_diff = t-button0_time;
             }
             if(button1_time) {
-                button1_dif = t-button1_time;
+                button1_diff = t-button1_time;
             }
-            if((button0_dif||button1_dif)&&(plosa->editpos==EPOS_CENTER)) { // only from central position (flag)
+            if((button0_diff||button1_diff)&&(plosa->editpos==EPOS_CENTER)) { // only from central position (flag)
                 //printf("%d %d %d\n",t,button0_time,button0_dif);
-                if(button0_dif>=US) {
-                    printf("REBOOT: [%d->%d] s\n", button0_dif/MS, REBOOT/MS);
+                if(button0_diff>=US) {
+                    printf("REBOOT: [%d->%d] s\n", button0_diff/MS, REBOOT/MS);
                 }
-                if(button1_dif>=US) {
-                    printf("REBOOT: [%d->%d] s\n", button1_dif/MS, REBOOT/MS);
+                if(button1_diff>=US) {
+                    printf("REBOOT: [%d->%d] s\n", button1_diff/MS, REBOOT/MS);
                 }
-                if(button0_dif>=REBOOT || button1_dif >= REBOOT) {
+                if(button0_diff>=REBOOT || button1_diff >= REBOOT) {
                     printf("SAVING...\n");
                     dosave();
                 }
