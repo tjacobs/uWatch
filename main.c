@@ -34,6 +34,17 @@
 #include "img/Font30.h"
 #include "img/FontAvenir60.h"
 
+// Start date time
+datetime_t default_time = {
+    .year  = 2023,
+    .month = 2,
+    .day   = 1,
+    .dotw  = 3, // 0 is Sunday
+    .hour  = 12,
+    .min   = 0,
+    .sec   = 0
+};
+
 // Screen positions
 #define POS_TIME_X 64
 #define POS_TIME_Y 120
@@ -77,6 +88,23 @@ char buffer[10];
 // Screen
 bool draw_text_enabled = true;
 DOImage* screen_image;
+
+// Battery
+typedef struct battery_t {
+    float voltage;
+    float min;
+    float max;
+} battery_t;
+
+// Data storage
+typedef struct {
+    datetime_t datetime;
+    battery_t battery;
+    uint8_t brightness;
+    uint8_t save_crc;
+} DATA_t;
+static __attribute__((section (".noinit")))char data_buffer[4096];
+static DATA_t* data = (DATA_t*)data_buffer;
 
 // Functions
 void gpio_callback(uint gpio, uint32_t events);
@@ -151,30 +179,30 @@ void draw_screen() {
 
     // Battery
     lcd_str(50, 208, "BATTERY", &Font16, WHITE, BLACK);
-    lcd_floatshort(130, 208, battery_voltage, &Font16, ORANGE, BLACK);
+    lcd_floatshort(130, 208, data->battery.voltage, &Font16, ORANGE, BLACK);
 
     // Day of the week
-    lcd_str(POS_DOW_X, POS_DOW_Y, week[0], &Font16, WHITE, BLACK); // week[data->datetime.dotw])
+    lcd_str(POS_DOW_X, POS_DOW_Y, week[data->datetime.dotw], &Font16, WHITE, BLACK);
 
     // Day
-    //sprintf(buffer, "%2d", data->datetime.day);
+    sprintf(buffer, "%2d", data->datetime.day);
     lcd_str(POS_DATE_X + 0 * COLUMN_WIDTH, POS_DATE_Y, buffer, &FontAvenir60, WHITE, BLACK);
     lcd_str(POS_DATE_X + 2 * COLUMN_WIDTH, POS_DATE_Y, ".",    &FontAvenir60, WHITE, BLACK);
 
     // Hour
-    int hour = 0; //data->datetime.hour;
+    int hour = data->datetime.hour;
     if (hour > 12) hour -= 12;
     if (hour == 0) hour = 12;
     sprintf(buffer, "%2d", hour);
     lcd_str(POS_TIME_X + 0 * COLUMN_WIDTH, POS_TIME_Y, buffer, &FontAvenir60, WHITE, BLACK);
 
     // Min
-    //sprintf(buffer, "%02d", data->datetime.min);
+    sprintf(buffer, "%02d", data->datetime.min);
     lcd_str(POS_TIME_X + 1 * COLUMN_WIDTH, POS_TIME_Y, ":",    &FontAvenir60, WHITE, BLACK);
     lcd_str(POS_TIME_X + 3 * COLUMN_WIDTH, POS_TIME_Y, buffer, &FontAvenir60, WHITE, BLACK);
 
     // Sec
-    //sprintf(buffer, "%02d", data->datetime.sec);
+    sprintf(buffer, "%02d", data->datetime.sec);
     lcd_str(POS_TIME_X + 7 * COLUMN_WIDTH, POS_TIME_Y, ":",    &FontAvenir60, WHITE, BLACK);
     lcd_str(POS_TIME_X + 6 * COLUMN_WIDTH, POS_TIME_Y, buffer, &FontAvenir60, WHITE, BLACK);
 }
