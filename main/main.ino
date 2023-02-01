@@ -89,7 +89,7 @@ void setup() {
 
   // Clear screen
   tft.fillScreen(BLACK);
-  tft.drawCircle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2 - 1, WHITE);
+//  tft.drawCircle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2 - 1, WHITE);
 
   // Test
   data->datetime.hour = 12 + 3;
@@ -102,11 +102,14 @@ void loop(void) {
   drawScreen();
 
   // Test
-  data->datetime.min++;  if (data->datetime.min > 60)  data->datetime.min = 0;
-  data->datetime.dotw++; if (data->datetime.dotw >= 7) data->datetime.dotw = 0;
+  data->datetime.min++;  if (data->datetime.min >= 60) {
+    data->datetime.min = 0;
+    data->datetime.hour++;    
+    data->datetime.dotw++; if (data->datetime.dotw >= 7) data->datetime.dotw = 0;
+  }
 
   // Wait
-  delay(1000);
+  delay(500);
 }
 
 void drawScreen() {
