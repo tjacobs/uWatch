@@ -61,9 +61,13 @@ static DATA_t* data = (DATA_t*)data_buffer;
 // Screen
 #define SCREEN_WIDTH 240
 #define SCREEN_HEIGHT 240
-#define SCREEN_DC 9
-#define SCREEN_CS 10
-Adafruit_GC9A01A tft = Adafruit_GC9A01A(SCREEN_CS, SCREEN_DC);
+#define LCD_DC_PIN 8
+#define LCD_CS_PIN 9
+#define LCD_CLK_PIN 10
+#define LCD_MOSI_PIN 11
+#define LCD_RST_PIN 12
+#define LCD_BL_PIN 25
+Adafruit_GC9A01A tft = Adafruit_GC9A01A(LCD_CS_PIN, LCD_DC_PIN, LCD_MOSI_PIN, LCD_CLK_PIN, LCD_RST_PIN);
 
 // Canvas
 #define CANVAS_WIDTH 180
@@ -71,6 +75,15 @@ Adafruit_GC9A01A tft = Adafruit_GC9A01A(SCREEN_CS, SCREEN_DC);
 GFXcanvas1 canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
 
 void setup() {
+  // Screen
+  pinMode(LCD_RST_PIN, OUTPUT);
+  pinMode(LCD_DC_PIN, OUTPUT);
+  pinMode(LCD_CS_PIN, OUTPUT);
+  pinMode(LCD_BL_PIN, OUTPUT);
+  digitalWrite(LCD_CS_PIN, 1);
+  digitalWrite(LCD_DC_PIN, 0);
+  digitalWrite(LCD_BL_PIN, 1);
+
   // Start screen
   tft.begin();
 
@@ -93,7 +106,7 @@ void loop(void) {
   data->datetime.dotw++; if (data->datetime.dotw >= 7) data->datetime.dotw = 0;
 
   // Wait
-  delay(5000);
+  delay(1000);
 }
 
 void drawScreen() {
