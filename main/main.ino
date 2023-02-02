@@ -98,10 +98,10 @@ void setup() {
 //  tft.drawCircle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2 - 1, WHITE);
 
   // Test
-  data->datetime.hour = 11;
-  data->datetime.min = 50;
+  data->datetime.hour = 9;
+  data->datetime.min = 00;
   data->datetime.dotw = 3;
-  data->datetime.day = 1;
+  data->datetime.day = 2;
   data->datetime.month = 2;
 }
 
