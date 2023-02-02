@@ -1,6 +1,10 @@
 // Board: Raspberry Pi Pico
 // Core: Arduino RP2040 board
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "SPI.h"
 #include "Adafruit_GFX.h"
 #include "Adafruit_GC9A01A.h"
@@ -30,6 +34,7 @@ datetime_t default_time = {
 
 // Date
 char* week[7] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+char* month[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
 // Battery
 typedef struct battery_t {
@@ -49,13 +54,14 @@ static __attribute__((section (".noinit")))char data_buffer[4096];
 static DATA_t* data = (DATA_t*)data_buffer;
 
 // Colors
-#define RED     0xF000
+#define RED     0x00FA
 #define GREEN   0x0A00
 #define BLUE    0x00AF
-#define CYAN    0x00FA
-#define YELLOW  0xFFF0
+#define CYAN    0xFFF0
+#define YELLOW  0x00FA
 #define MAGENTA 0xFF00
 #define WHITE   0xFFFF
+#define GRAY    0xDFDD
 #define BLACK   0x0000
 
 // Screen
@@ -92,9 +98,11 @@ void setup() {
 //  tft.drawCircle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2 - 1, WHITE);
 
   // Test
-  data->datetime.hour = 12 + 3;
-  data->datetime.min = 30;
-  data->datetime.dotw = 0;
+  data->datetime.hour = 11;
+  data->datetime.min = 50;
+  data->datetime.dotw = 3;
+  data->datetime.day = 1;
+  data->datetime.month = 2;
 }
 
 void loop(void) {
@@ -102,17 +110,56 @@ void loop(void) {
   drawScreen();
 
   // Test
-  data->datetime.min++;  if (data->datetime.min >= 60) {
+  data->datetime.min++;
+  if (data->datetime.min >= 60) {
     data->datetime.min = 0;
-    data->datetime.hour++;    
-    data->datetime.dotw++; if (data->datetime.dotw >= 7) data->datetime.dotw = 0;
+    data->datetime.hour++;
+    if (data->datetime.hour >= 24) {
+      data->datetime.hour = 0;
+    }
+    data->datetime.dotw++;
+    if (data->datetime.dotw >= 7) data->datetime.dotw = 0;
   }
 
   // Wait
-  delay(500);
+  delay(5000);
 }
 
 void drawScreen() {
+  // Clear
+  tft.fillRect(POS_TIME_X, POS_TIME_Y, CANVAS_WIDTH, CANVAS_HEIGHT + 30, BLACK);
+
+  // Set text style
+  tft.setFont(&FreeSansBold24pt7b);
+  tft.setTextColor(WHITE);
+  tft.setTextSize(1);
+  tft.setCursor(POS_TIME_X, POS_TIME_Y + 40);
+
+  // Format
+  const char* ampm = "AM";
+  int hour = data->datetime.hour;
+  if (hour == 12) {ampm = "PM";}
+  if (hour > 12) {hour -= 12; ampm = "PM";}
+  if (hour == 0) hour = 12;
+  int minute = data->datetime.min;
+  char buffer[10];
+  sprintf(buffer, "%d:%.2d", hour, minute);
+
+  // Show
+  tft.print(buffer);
+  tft.setFont(&FreeSansBold9pt7b);
+  tft.setTextColor(GRAY);
+  tft.print(ampm);
+
+  // Day of week
+  tft.setFont(&FreeSansBold9pt7b);
+  tft.setCursor(POS_DOW_X + 20, POS_DOW_Y + 20);
+  sprintf(buffer, "%s %d %s", week[data->datetime.dotw], data->datetime.day, month[data->datetime.month - 1]);
+  tft.setTextColor(CYAN);
+  tft.print(buffer);
+}
+
+void drawScreenCanvas() {
   // Set text
   canvas.setFont(&FreeSansBold24pt7b);
   canvas.setTextColor(WHITE);
