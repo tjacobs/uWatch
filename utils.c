@@ -4,8 +4,13 @@
 //
 
 #include <stdio.h>
+#include "pico/stdlib.h"
+#include "pico/binary_info.h"
 #include "hardware/gpio.h"
 #include "hardware/i2c.h"
+
+// Forward declaration
+void command(char* c);
 
 // Shell commands
 uint16_t comi=0;
@@ -67,7 +72,10 @@ void i2c_scan() {
         if (addr % 16 == 0) printf("%02x ", addr);
         int ret;
         uint8_t rxdata=0;
-        if (reserved_addr(addr)) ret = PICO_ERROR_GENERIC;
+
+        // Check reserved addresses, addresses of the form 000 0xxx or 111 1xxx are reserved
+        bool is_reserved = (addr & 0x78) == 0 || (addr & 0x78) == 0x78;
+        if (is_reserved) ret = PICO_ERROR_GENERIC;
         else ret = i2c_read_blocking(I2C0, addr, &rxdata, 1, false);
         printf(ret < 0 ? "." : "@");
         printf(addr % 16 == 15 ? "\n" : "  ");
